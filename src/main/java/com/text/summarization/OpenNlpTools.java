@@ -2,10 +2,7 @@ package com.text.summarization;
 
 import java.lang.*;
 import java.io.*;
-import java.text.BreakIterator;
-import java.util.*;
 
-import jdk.nashorn.internal.objects.Global;
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -67,26 +64,27 @@ public class OpenNlpTools {
         String sa = "sana is my name. i live in kanitar. i do mscit in ku. i am completing my project ";
         OpenNlpTools ob = new OpenNlpTools();
         String[] s = ob.getSentences(sa);
+        String[] tokens = ob.getTokens(sa);
+        String[] posTag = ob.getPosTag(tokens);
+        String[] stems = ob.getStems(tokens);
+
+        System.out.println("Sentences");
         for (int i = 0; i < s.length; i++) {
             System.out.println(s[i]);
         }
 
-        String[] tokens = ob.getTokens(sa);
-        String[] posTag = ob.getPosTag(tokens);
-        String[] stems = ob.getStems(tokens);
+        System.out.println("tokens");
         for (String t : tokens ) {
             System.out.println(t);
         }
+        System.out.println("pos");
         for (String t : posTag ) {
             System.out.println(t);
         }
+        System.out.println("Stems");
         for (String t : stems ) {
             System.out.println(t);
         }
-
-
-
-
     }
 
 }
