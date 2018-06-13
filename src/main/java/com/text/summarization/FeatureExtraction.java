@@ -1,24 +1,25 @@
 package com.text.summarization;
 
+import opennlp.tools.formats.ad.ADSentenceStream;
+
 import java.lang.*;
 
 import java.io.*;
 import java.util.*;
 
-public class FeatureExtraction {
+import static com.text.summarization.Utils.*;
 
-    private Set<String> stopWordList = new HashSet<String>();
+public class FeatureExtraction {
+    private Set<String> stopWordList = new HashSet<>();
 
     public FeatureExtraction() throws FileNotFoundException {
         LoadStopWords();
     }
 
-
     private void LoadStopWords() throws FileNotFoundException {
-        Scanner scanner = new Scanner(new File("resources/stopwords.txt"));
+        Scanner scanner = new Scanner(new File(RESOURCE_DIRECTORY + "stopwords.txt"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine().toLowerCase().trim();
-
             if (line.length() > 0) {
                 stopWordList.add(line);
             }
@@ -26,52 +27,35 @@ public class FeatureExtraction {
         scanner.close();
     }
 
-    String[] biGrams(String[] words) {
-        int len = 2;
-        String[] rst = new String[words.length - len + 1];
-        for (int i = 0; i < words.length - len + 1; i++) {
-            StringBuilder sb = new StringBuilder();
-            for (int k = 0; k < len; k++) {
-                if (k > 0) sb.append('_');
-                sb.append(words[i + k]);
-            }
-            rst[i] = sb.toString();
+    private List<String> biGrams(String[] words) {
+        List<String> biGrams = new ArrayList<>();
+        for (int i = 0; i < words.length - 1; i++) {
+            String biGram = words[i] + "_" + words[i + 1];
+            biGrams.add(biGram);
         }
-        return rst;
+        return biGrams;
     }
 
-    String[] removeStopWords(String[] words) {
+    private List<String> removeStopWords(String[] words) {
         List<String> arrayList = new ArrayList();
-        for (String word :
-                words) {
-
+        for (String word : words) {
             if (!stopWordList.contains(word.toLowerCase().trim())) {
-
                 arrayList.add(word);
             }
-
         }
-        String[] removedStopWords = new String[arrayList.size()];
-        for (int i = 0; i < arrayList.size(); i++) {
-            removedStopWords[i] = arrayList.get(i);
-
-        }
-        return removedStopWords;
+        return arrayList;
     }
 
     double getUpperCaseWeight(String[] words) {
-        int count = 0;
-        for (String word :
-                words) {
+        double count = 0;
+        for (String word : words) {
             if (word.toUpperCase().equals(word)) {
                 count++;
             }
-
         }
         if (count > 0) {
-            return 0.2;
+            return count / words.length;
         }
-
         return 0.0;
     }
 
@@ -79,13 +63,13 @@ public class FeatureExtraction {
         if (words.length > 15) {
             return 0.4;
         } else if (words.length > 10) {
-            return 0.3;
+            return 0.2;
         }
-        return 0.0;
+        return 0.1;
     }
 
-    double getSentencePositionWeight(int n, int position) {
-        int val = n / 4;
+    double getSentencePositionWeight(int totalSentences, int position) {
+        int val = totalSentences / 4;
         if (position <= val) {
             return 0.3;
         }
@@ -94,50 +78,40 @@ public class FeatureExtraction {
     }
 
     double getPartOfSpeechWeight(String[] pos) {
-        int count = 0;
+        double count = 0;
         for (String p :
                 pos) {
-            if (p.equalsIgnoreCase("vrb") || p.equalsIgnoreCase("nn")) {
+            if (p.startsWith("VB") || p.startsWith("NN")) {
                 count++;
             }
         }
         if (count > 0) {
-            return 0.3;
+            return count / pos.length;
         }
         return 0.0;
     }
 
     public static void main(String[] args) throws FileNotFoundException {
         FeatureExtraction ob = new FeatureExtraction();
-        String s = "this is my program";
+        String s = "this is my PROGRAM";
         String[] tokens = s.split(" ");
-        String[] biGrams = ob.biGrams(tokens);
-        for (String biGram :
-                biGrams) {
+        for (String biGram : ob.biGrams(tokens)) {
             System.out.println(biGram);
-
         }
 
-        String[] stopWords = ob.removeStopWords(tokens);
-
-        for (String stop :
-                stopWords
-                ) {
+        for (String stop : ob.removeStopWords(tokens)) {
             System.out.println(stop);
-
-            double UpperCaseWeight = ob.getUpperCaseWeight(tokens);
-
-            System.out.println(UpperCaseWeight);
-
-            double SentenceLengthWeight = ob.getSentenceLengthWeight(tokens);
-            System.out.println(SentenceLengthWeight);
-
-
-            double SentencePositionWeight = ob.getSentencePositionWeight(50, 5);
-            System.out.println(SentenceLengthWeight);
-
-
         }
+
+        double upperCaseWeight = ob.getUpperCaseWeight(tokens);
+        System.out.println(upperCaseWeight);
+
+        double senLengthWeight = ob.getSentenceLengthWeight(tokens);
+        System.out.println(senLengthWeight);
+
+
+        double senositionWeight = ob.getSentencePositionWeight(50, 5);
+        System.out.println(senositionWeight);
     }
 }
 
