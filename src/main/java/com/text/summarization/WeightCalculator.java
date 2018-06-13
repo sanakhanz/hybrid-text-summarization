@@ -33,7 +33,7 @@ public class WeightCalculator {
     }
 
     //term freq
-    public void calculateTermFrequency(String[] vector) {
+    public void calculateTermFrequency(List<String> vector) {
         for (String vec : vector) {
             termFrequency.put(vec, termFrequency.getOrDefault(vec, 0) + 1);
         }
@@ -59,7 +59,7 @@ public class WeightCalculator {
         HashMap<String, Integer> documentFreq = calculateDocFrequency(openNlpTools);
         write(documentFreq);
         WeightCalculator calculator = new WeightCalculator();
-        String[] tokens = "Calculates Df using background corpus".split(" ");
+        List<String> tokens = Arrays.asList("Calculates Df using background corpus".split(" "));
         calculator.calculateTermFrequency(tokens);
         System.out.println(calculator.tfIdf("Df"));
     }

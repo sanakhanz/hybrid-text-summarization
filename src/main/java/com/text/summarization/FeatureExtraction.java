@@ -1,7 +1,5 @@
 package com.text.summarization;
 
-import opennlp.tools.formats.ad.ADSentenceStream;
-
 import java.lang.*;
 
 import java.io.*;
@@ -10,10 +8,13 @@ import java.util.*;
 import static com.text.summarization.Utils.*;
 
 public class FeatureExtraction {
+    private HashMap<Integer, String> sentencePositionMap = new HashMap<>();
     private Set<String> stopWordList = new HashSet<>();
+    private OpenNlpTools openNlpTools;
 
-    public FeatureExtraction() throws FileNotFoundException {
+    public FeatureExtraction() throws IOException {
         LoadStopWords();
+        openNlpTools = new OpenNlpTools();
     }
 
     private void LoadStopWords() throws FileNotFoundException {
@@ -27,7 +28,7 @@ public class FeatureExtraction {
         scanner.close();
     }
 
-    private List<String> biGrams(String[] words) {
+    public List<String> biGrams(String[] words) {
         List<String> biGrams = new ArrayList<>();
         for (int i = 0; i < words.length - 1; i++) {
             String biGram = words[i] + "_" + words[i + 1];
@@ -36,7 +37,7 @@ public class FeatureExtraction {
         return biGrams;
     }
 
-    private List<String> removeStopWords(String[] words) {
+    public List<String> removeStopWords(String[] words) {
         List<String> arrayList = new ArrayList();
         for (String word : words) {
             if (!stopWordList.contains(word.toLowerCase().trim())) {
@@ -79,8 +80,7 @@ public class FeatureExtraction {
 
     double getPartOfSpeechWeight(String[] pos) {
         double count = 0;
-        for (String p :
-                pos) {
+        for (String p : pos) {
             if (p.startsWith("VB") || p.startsWith("NN")) {
                 count++;
             }
@@ -91,7 +91,14 @@ public class FeatureExtraction {
         return 0.0;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    void loadSentancePositionMap(String[] sentences) {
+        int i = 0;
+        for (String sentence : sentences) {
+            sentencePositionMap.put(i++, sentence);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
         FeatureExtraction ob = new FeatureExtraction();
         String s = "this is my PROGRAM";
         String[] tokens = s.split(" ");

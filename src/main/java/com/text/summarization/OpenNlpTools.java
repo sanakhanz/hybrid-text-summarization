@@ -2,6 +2,7 @@ package com.text.summarization;
 
 import java.lang.*;
 import java.io.*;
+import java.util.List;
 
 import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
@@ -63,6 +64,14 @@ public class OpenNlpTools {
         return stems;
     }
 
+    String[] getStems(List<String> tokens) {
+        String[] stems = new String[tokens.size()];
+        int i = 0;
+        for (String token : tokens) {
+            stems[i++] = porterStemmer.stem(token);
+        }
+        return stems;
+    }
 
     public static void main(String[] arg) throws IOException {
         String sa = "sana is my name. i live in kanitar. i do mscit in ku. i am completing my project ";
@@ -78,15 +87,15 @@ public class OpenNlpTools {
         }
 
         System.out.println("tokens");
-        for (String t : tokens ) {
+        for (String t : tokens) {
             System.out.println(t);
         }
         System.out.println("pos");
-        for (String t : posTag ) {
+        for (String t : posTag) {
             System.out.println(t);
         }
         System.out.println("Stems");
-        for (String t : stems ) {
+        for (String t : stems) {
             System.out.println(t);
         }
     }
