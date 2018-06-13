@@ -13,6 +13,7 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 
 public class OpenNlpTools {
+    String RESOURCE_PATH = "/home/shabir/Downloads/openNlp-models/";
     private SentenceDetectorME detector;
     private Tokenizer tokenizer;
     private POSTaggerME posTaggerME;
@@ -21,15 +22,15 @@ public class OpenNlpTools {
 
     public OpenNlpTools() throws IOException {
 
-        InputStream senStream = new FileInputStream("resources/en-sent.bin");
+        InputStream senStream = new FileInputStream(RESOURCE_PATH + "en-sent.bin");
         SentenceModel model = new SentenceModel(senStream);
         detector = new SentenceDetectorME(model);
 
-        InputStream tokStream = new FileInputStream("resources/en-token.bin");
+        InputStream tokStream = new FileInputStream(RESOURCE_PATH + "en-token.bin");
         TokenizerModel tokenizerModel = new TokenizerModel(tokStream);
         tokenizer = new TokenizerME(tokenizerModel);
 
-        InputStream posStream = new FileInputStream("resources/en-pos-maxent.bin");
+        InputStream posStream = new FileInputStream(RESOURCE_PATH + "en-pos-maxent.bin");
         POSModel posModel = new POSModel(posStream);
         posTaggerME = new POSTaggerME(posModel);
 

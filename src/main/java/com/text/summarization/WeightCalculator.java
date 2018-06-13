@@ -8,20 +8,41 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 public class WeightCalculator {
-    int totalNoOfCorpusDocuments = 0;
-    OpenNlpTools openNlpProcessing;
+    private int TOTAL_NO_OF_CORPUS = 823;
+    private int totalNoOfCorpusDocuments = 0;
+    private OpenNlpTools openNlpProcessing;
+    private HashMap<String, Integer> documentFrequency;
 
     public WeightCalculator(OpenNlpTools openNlpProcessing) throws IOException {
         this.openNlpProcessing = openNlpProcessing;
-        HashMap<String, Integer> documentfreq = calculateDf();
-        write(documentfreq);
+        //HashMap<String, Integer> documentfreq = calculateDf();
+        //write(documentfreq);
+        loadDfFile("dict.txt");
+    }
+
+    private void loadDfFile(String file) throws FileNotFoundException {
+        documentFrequency = new HashMap<>();
+        Scanner scanner = new Scanner(new File(file));
+        while (scanner.hasNextLine()) {
+            String s = scanner.nextLine();
+            String[] split = s.split("\t");
+            if (split.length == 2) {
+                documentFrequency.put(split[0].trim(), Integer.valueOf(split[1].trim()));
+            } else {
+                System.out.println(s);
+            }
+        }
+        scanner.close();
+        System.out.println(documentFrequency);
+        System.out.println(totalNoOfCorpusDocuments);
     }
 
     private void write(HashMap<String, Integer> documentfreq) throws FileNotFoundException {
-        PrintWriter printWriter = new PrintWriter("resources/dict.txt");
+        PrintWriter printWriter = new PrintWriter("dict.txt");
         Set<String> keys = documentfreq.keySet();
         for (String key : keys) {
             printWriter.write(key + "\t" + documentfreq.get(key) + "\n");
