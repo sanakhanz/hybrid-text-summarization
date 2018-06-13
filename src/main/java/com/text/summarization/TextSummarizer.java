@@ -1,9 +1,11 @@
 package com.text.summarization;
 
+import java.io.FileNotFoundException;
+
 public class TextSummarizer {
     private FeatureExtraction featureExtraction;
 
-    public TextSummarizer() {
+    public TextSummarizer() throws FileNotFoundException {
         featureExtraction = new FeatureExtraction();
     }
 
@@ -12,7 +14,7 @@ public class TextSummarizer {
         return null;
     }
 
-    public static void main(String[] arg)  {
+    public static void main(String[] arg) throws FileNotFoundException {
         TextSummarizer textSummarizer = new TextSummarizer();
         String text = "";
         String summary = textSummarizer.getSummary(text);

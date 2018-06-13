@@ -42,14 +42,17 @@ public class OpenNlpTools {
     }
 
     String[] getSentences(String text) {
+
         return detector.sentDetect(text);
     }
 
     String[] getTokens(String text) {
+
         return tokenizer.tokenize(text);
     }
 
     String[] getPosTag(String[] tokens) {
+
         return posTaggerME.tag(tokens);
     }
 
