@@ -28,7 +28,27 @@ public class FeatureExtraction {
         scanner.close();
     }
 
-    public List<String> biGrams(String[] words) {
+    public String[] getSentences(String text) {
+        return openNlpTools.getSentences(text);
+    }
+
+    public String[] getTokens(String text) {
+        return openNlpTools.getTokens(text);
+    }
+
+    public String[] getStems(String[] tokens) {
+        return openNlpTools.getStems(tokens);
+    }
+
+    public String[] getStems(List<String> tokens) {
+        return openNlpTools.getStems(tokens);
+    }
+
+    public String[] getPosTags(String[] tokens) {
+        return openNlpTools.getPosTag(tokens);
+    }
+
+    public List<String> getBiGrams(String[] words) {
         List<String> biGrams = new ArrayList<>();
         for (int i = 0; i < words.length - 1; i++) {
             String biGram = words[i] + "_" + words[i + 1];
@@ -75,7 +95,6 @@ public class FeatureExtraction {
             return 0.3;
         }
         return 0.0;
-
     }
 
     double getPartOfSpeechWeight(String[] pos) {
@@ -102,7 +121,7 @@ public class FeatureExtraction {
         FeatureExtraction ob = new FeatureExtraction();
         String s = "this is my PROGRAM";
         String[] tokens = s.split(" ");
-        for (String biGram : ob.biGrams(tokens)) {
+        for (String biGram : ob.getBiGrams(tokens)) {
             System.out.println(biGram);
         }
 

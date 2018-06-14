@@ -35,33 +35,31 @@ public class WeightCalculator {
     //term freq
     public void calculateTermFrequency(List<String> vector) {
         for (String vec : vector) {
+            vec = vec.toLowerCase().trim();
             termFrequency.put(vec, termFrequency.getOrDefault(vec, 0) + 1);
         }
     }
 
     //inverse doc freq
     public double idf(String term) {
-        if (documentFrequency.containsKey(term)) {
-            int docFreq = documentFrequency.get(term);
-            return Math.log(TOTAL_NO_OF_CORPUS / docFreq);
-        } else {
-            return 1.0;
-        }
+        double docFreq = documentFrequency.getOrDefault(term, 1);
+        return Math.log(TOTAL_NO_OF_CORPUS / docFreq);
     }
 
     //term freq-inverse doc freq
-    public double tfIdf(String term) {
+    public double getTfIdf(String term) {
+        term = term.toLowerCase().trim();
         return termFrequency.get(term) * idf(term);
     }
 
     public static void main(String[] args) throws IOException {
-        OpenNlpTools openNlpTools = new OpenNlpTools();
-        HashMap<String, Integer> documentFreq = calculateDocFrequency(openNlpTools);
+        FeatureExtraction featureExtraction = new FeatureExtraction();
+        HashMap<String, Integer> documentFreq = calculateDocFrequency(featureExtraction);
         write(documentFreq);
         WeightCalculator calculator = new WeightCalculator();
         List<String> tokens = Arrays.asList("Calculates Df using background corpus".split(" "));
         calculator.calculateTermFrequency(tokens);
-        System.out.println(calculator.tfIdf("Df"));
+        System.out.println(calculator.getTfIdf("Df"));
     }
 
     /**
@@ -69,39 +67,42 @@ public class WeightCalculator {
      *
      * @throws IOException
      */
-    public static HashMap<String, Integer> calculateDocFrequency(OpenNlpTools openNlpTools) throws IOException {
+    public static HashMap<String, Integer> calculateDocFrequency(FeatureExtraction featureExtraction) throws IOException {
         int totalNoOfCorpusDocuments = 0;
         HashMap<String, Integer> documentFrequency = new HashMap<>();
-        HashMap<Integer, Set<String>> documentss = new HashMap<>();
         File dir = new File(RESOURCE_DIRECTORY + "Documents/");
         File[] allfiles = dir.listFiles();
         for (File f : allfiles) {
             if (f.getName().endsWith(".txt")) {
+                totalNoOfCorpusDocuments++;
                 String s = new String(Files.readAllBytes(Paths.get(f.getAbsolutePath())));
                 String document = s.toLowerCase();
-                Set<String> tokenSet = new HashSet<>();
-                String[] tokenArray = openNlpTools.getTokens(document);
-                String[] stems = openNlpTools.getStems(tokenArray);
-
-                for (int i = 0; i < tokenArray.length; i++) {
-                    String tok = tokenArray[i].trim().toLowerCase();
-                    if (!tokenSet.contains(tok)) {
-                        tokenSet.add(tok);
-                    }
-                    documentFrequency.put(tok, documentFrequency.getOrDefault(tok, 0) + 1);
+                String[] tokenArray = featureExtraction.getTokens(document);
+                String[] stems = featureExtraction.getStems(tokenArray);
+                List<String> biGrams = featureExtraction.getBiGrams(tokenArray);
+                List<String> removeStopWords = featureExtraction.removeStopWords(tokenArray);
+                Set<String> vector = getVector(removeStopWords, stems, biGrams);
+                for (String vec : vector) {
+                    documentFrequency.put(vec, documentFrequency.getOrDefault(vec, 0) + 1);
                 }
-                for (int i = 0; i < stems.length; i++) {
-                    String stm = stems[i].trim().toLowerCase();
-                    if (!tokenSet.contains(stm)) {
-                        tokenSet.add(stm);
-                    }
-                    documentFrequency.put(stm, documentFrequency.getOrDefault(stm, 0) + 1);
-                }
-                documentss.put(totalNoOfCorpusDocuments++, tokenSet);
             }
         }
         System.out.println("TOTAL_ CORPUS DOCUMENTS: " + totalNoOfCorpusDocuments);
         return documentFrequency;
+    }
+
+    private static Set<String> getVector(List<String> removeStopWords, String[] stems, List<String> biGrams) {
+        Set<String> vector = new HashSet<>();
+        for (String s : removeStopWords) {
+            vector.add(s.toLowerCase().trim());
+        }
+        for (String s : stems) {
+            vector.add(s.toLowerCase().trim());
+        }
+        for (String s : biGrams) {
+            vector.add(s.toLowerCase().trim());
+        }
+        return vector;
     }
 
     private static void write(HashMap<String, Integer> documentfreq) throws FileNotFoundException {

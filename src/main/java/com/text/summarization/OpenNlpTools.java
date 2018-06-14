@@ -36,22 +36,17 @@ public class OpenNlpTools {
         posTaggerME = new POSTaggerME(posModel);
 
         porterStemmer = new PorterStemmer();
-
-
     }
 
     String[] getSentences(String text) {
-
         return detector.sentDetect(text);
     }
 
     String[] getTokens(String text) {
-
         return tokenizer.tokenize(text);
     }
 
     String[] getPosTag(String[] tokens) {
-
         return posTaggerME.tag(tokens);
     }
 
