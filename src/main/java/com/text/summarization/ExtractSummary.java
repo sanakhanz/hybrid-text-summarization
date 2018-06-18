@@ -10,10 +10,12 @@ public class ExtractSummary {
     private FeatureExtraction featureExtraction;
     private WeightCalculator weightCalculator;
     private List<String> docVector;
+    private CosineSimilarity similarity;
 
     public ExtractSummary(OpenNlpTools openNlpTools) throws IOException {
         featureExtraction = new FeatureExtraction();
         weightCalculator = new WeightCalculator();
+        similarity = new CosineSimilarity(featureExtraction);
     }
 
     public void extractSummary(String[] sentences) {
