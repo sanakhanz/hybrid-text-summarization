@@ -19,7 +19,10 @@ public class ExtractSummary {
     public void extractSummary(String[] sentences) {
         docVector = new ArrayList<>();
         HashMap<Integer, Double> weightMap = getVectorArray(sentences);
-
+        System.out.println("SentencePosition\tWeight");
+        for (int position : weightMap.keySet()) {
+            System.out.println(position + "\t" + weightMap.get(position));
+        }
     }
 
     private HashMap<Integer, Double> getVectorArray(String[] sentences) {

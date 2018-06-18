@@ -70,7 +70,7 @@ public class WeightCalculator {
     public static HashMap<String, Integer> calculateDocFrequency(FeatureExtraction featureExtraction) throws IOException {
         int totalNoOfCorpusDocuments = 0;
         HashMap<String, Integer> documentFrequency = new HashMap<>();
-        File dir = new File(RESOURCE_DIRECTORY + "Documents/");
+        File dir = new File(RESOURCE_DIRECTORY + "corpus/");
         File[] allfiles = dir.listFiles();
         for (File f : allfiles) {
             if (f.getName().endsWith(".txt")) {
