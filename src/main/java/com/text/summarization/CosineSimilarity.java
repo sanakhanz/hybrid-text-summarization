@@ -24,34 +24,22 @@ public class CosineSimilarity {
         Map<String, Integer> leftWordCountMap = new HashMap<>();
         Map<String, Integer> rightWordCountMap = new HashMap<>();
         Set<String> uniqueSet = new HashSet<>();
-        Integer temp = null;
         for (String leftWord : vector1) {
-            temp = leftWordCountMap.get(leftWord);
-            if (temp == null) {
-                leftWordCountMap.put(leftWord, 1);
-                uniqueSet.add(leftWord);
-            } else {
-                leftWordCountMap.put(leftWord, temp + 1);
-            }
+            leftWord = leftWord.toLowerCase().trim();
+            leftWordCountMap.put(leftWord, leftWordCountMap.getOrDefault(leftWord, 0) + 1);
+            uniqueSet.add(leftWord);
         }
         for (String rightWord : vector2) {
-            temp = rightWordCountMap.get(rightWord);
-            if (temp == null) {
-                rightWordCountMap.put(rightWord, 1);
-                uniqueSet.add(rightWord);
-            } else {
-                rightWordCountMap.put(rightWord, temp + 1);
-            }
+            rightWord = rightWord.toLowerCase().trim();
+            rightWordCountMap.put(rightWord, rightWordCountMap.getOrDefault(rightWord, 0) + 1);
+            uniqueSet.add(rightWord);
         }
         int[] leftVector = new int[uniqueSet.size()];
         int[] rightVector = new int[uniqueSet.size()];
         int index = 0;
-        Integer tempCount = 0;
         for (String uniqueWord : uniqueSet) {
-            tempCount = leftWordCountMap.get(uniqueWord);
-            leftVector[index] = tempCount == null ? 0 : tempCount;
-            tempCount = rightWordCountMap.get(uniqueWord);
-            rightVector[index] = tempCount == null ? 0 : tempCount;
+            leftVector[index] = leftWordCountMap.getOrDefault(uniqueWord, 0);
+            rightVector[index] = rightWordCountMap.getOrDefault(uniqueWord, 0);
             index++;
         }
 
