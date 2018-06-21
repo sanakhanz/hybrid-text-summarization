@@ -1,9 +1,7 @@
 package com.text.summarization;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ExtractSummary {
 
@@ -12,19 +10,31 @@ public class ExtractSummary {
     private List<String> docVector;
     private CosineSimilarity similarity;
 
-    public ExtractSummary(OpenNlpTools openNlpTools) throws IOException {
-        featureExtraction = new FeatureExtraction();
+    public ExtractSummary(FeatureExtraction featureExtraction) throws IOException {
+        this.featureExtraction = featureExtraction;
         weightCalculator = new WeightCalculator();
         similarity = new CosineSimilarity(featureExtraction);
     }
 
-    public void extractSummary(String[] sentences) {
+    public Map extractSummary(String[] sentences) {
         docVector = new ArrayList<>();
         HashMap<Integer, Double> weightMap = getVectorArray(sentences);
         System.out.println("SentencePosition\tWeight");
         for (int position : weightMap.keySet()) {
             System.out.println(position + "\t" + weightMap.get(position));
         }
+
+        //Use Cosine Similarity
+        Map map = removeSimilarSentences(weightMap, sentences);
+
+        //get Top n% sentences
+        Map<Integer, Double> topN = getTopN(map, 0.40);
+
+        System.out.println("Top Sentences\n SentencePosition\tWeight");
+        for (int position : topN.keySet()) {
+            System.out.println(position + "\t" + weightMap.get(position));
+        }
+        return topN;
     }
 
     private HashMap<Integer, Double> getVectorArray(String[] sentences) {
@@ -88,5 +98,68 @@ public class ExtractSummary {
             vectorWeight = vectorWeight + weightCalculator.getTfIdf(vec);
         }
         return vectorWeight / (double) vector.size();
+    }
+
+    private Map removeSimilarSentences(HashMap<Integer, Double> weightMap, String[] sentences) {
+        Set<Integer> duplicates = new HashSet<>();
+        for (int i = 0; i < sentences.length; i++) {
+            for (int j = i + 1; j < sentences.length; j++) {
+                Double weightSen1 = weightMap.get(i);
+                Double weightSen2 = weightMap.get(j);
+                String[] tokensSen1 = featureExtraction.getTokens(sentences[i]);
+                String[] tokensSen2 = featureExtraction.getTokens(sentences[j]);
+                double similarityScore = similarity.getSimilarityScore(tokensSen1, tokensSen2);
+                if (similarityScore > 0.9) {
+                    int p = weightSen1 > weightSen2 ? j : i;
+                    duplicates.add(p);
+                }
+            }
+        }
+        for (Integer position : duplicates) {
+            weightMap.remove(position);
+        }
+        return sortByValue(weightMap);
+    }
+
+    private Map sortByValue(HashMap<Integer, Double> weightMap) {
+        List list = new LinkedList(weightMap.entrySet());
+
+        // Defined Custom Comparator here
+        Collections.sort(list, (Comparator) (o1, o2) -> ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue()));
+        Map sortedHashMap = new LinkedHashMap();
+        for (Iterator it = (list).iterator(); it.hasNext(); ) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedHashMap;
+    }
+
+    private Map sortByKey(Map<Integer, Double> weightMap) {
+        List list = new LinkedList(weightMap.entrySet());
+
+        // Defined Custom Comparator here
+        Collections.sort(list, (Comparator) (o1, o2) -> ((Comparable) ((Map.Entry) (o1)).getKey()).compareTo(((Map.Entry) (o2)).getKey()));
+        Map sortedHashMap = new LinkedHashMap();
+        for (Iterator it = (list).iterator(); it.hasNext(); ) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedHashMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedHashMap;
+    }
+
+    private Map getTopN(Map map, double per) {
+        int size = map.size();
+        double percent = per * 100;
+        double v = Math.ceil((percent / 100) * size);
+        Map topMap = new LinkedHashMap();
+        Set<Integer> set = map.keySet();
+        int i = 1;
+        for (Integer pos : set) {
+            if (i++ > v) {
+                break;
+            }
+            topMap.put(pos, map.get(pos));
+        }
+        return sortByKey(topMap);
     }
 }
