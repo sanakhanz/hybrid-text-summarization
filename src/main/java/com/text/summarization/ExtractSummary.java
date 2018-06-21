@@ -16,7 +16,7 @@ public class ExtractSummary {
         similarity = new CosineSimilarity(featureExtraction);
     }
 
-    public Map extractSummary(String[] sentences) {
+    public Map extractSummary(String[] sentences, double summaryPercentage) {
         docVector = new ArrayList<>();
         HashMap<Integer, Double> weightMap = getVectorArray(sentences);
         System.out.println("SentencePosition\tWeight");
@@ -28,9 +28,9 @@ public class ExtractSummary {
         Map map = removeSimilarSentences(weightMap, sentences);
 
         //get Top n% sentences
-        Map<Integer, Double> topN = getTopN(map, 0.40);
+        Map<Integer, Double> topN = getTopN(map, summaryPercentage);
 
-        System.out.println("Top Sentences\n SentencePosition\tWeight");
+        System.out.println("\nTop Sentences\nSentencePosition\tWeight");
         for (int position : topN.keySet()) {
             System.out.println(position + "\t" + weightMap.get(position));
         }
@@ -147,9 +147,8 @@ public class ExtractSummary {
         return sortedHashMap;
     }
 
-    private Map getTopN(Map map, double per) {
+    private Map getTopN(Map map, double percent) {
         int size = map.size();
-        double percent = per * 100;
         double v = Math.ceil((percent / 100) * size);
         Map topMap = new LinkedHashMap();
         Set<Integer> set = map.keySet();
