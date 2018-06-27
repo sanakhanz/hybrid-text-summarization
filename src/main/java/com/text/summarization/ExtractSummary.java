@@ -159,6 +159,10 @@ public class ExtractSummary {
             }
             topMap.put(pos, map.get(pos));
         }
+
+        if (!topMap.containsKey(0)) {
+            topMap.put(0, map.get(0));
+        }
         return sortByKey(topMap);
     }
 }

@@ -8,7 +8,6 @@ import java.util.*;
 import static com.text.summarization.Utils.*;
 
 public class FeatureExtraction {
-    private HashMap<Integer, String> sentencePositionMap = new HashMap<>();
     private Set<String> stopWordList = new HashSet<>();
     private OpenNlpTools openNlpTools;
 
@@ -108,13 +107,6 @@ public class FeatureExtraction {
             return count / pos.length;
         }
         return 0.0;
-    }
-
-    void loadSentancePositionMap(String[] sentences) {
-        int i = 0;
-        for (String sentence : sentences) {
-            sentencePositionMap.put(i++, sentence);
-        }
     }
 
     public static void main(String[] args) throws IOException {

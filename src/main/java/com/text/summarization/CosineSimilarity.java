@@ -12,9 +12,7 @@ public class CosineSimilarity {
         this.featureExtraction = openNlpTools;
     }
 
-    public CosineSimilarity() {
-
-    }
+    public CosineSimilarity() {}
 
     public double getSimilarityScore(String s1, String s2) {
         return getSimilarityScore(featureExtraction.getTokens(s1), featureExtraction.getTokens(s2));
